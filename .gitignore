@@ -7,7 +7,10 @@ __pycache__/
 *.so
 
 # Pycharm
-.idea/*
+.idea/
+
+# Datasets
+data/
 
 # Distribution / packaging
 .Python
