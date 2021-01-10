@@ -1,6 +1,10 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructField, StructType, StringType, IntegerType
-from pyspark.sql.functions import avg, stddev, format_number, mean
+from pyspark.sql.functions import (avg,
+                                   stddev,
+                                   format_number,
+                                   mean,
+                                   year)
 
 spark = SparkSession.builder.appName('dataframe_basics').getOrCreate()
 df = spark.read.json('data/people.json')
@@ -12,7 +16,7 @@ print(df.columns)
 manual_schema = [StructField('age', IntegerType(), True),
                  StructField('name', StringType(), True)]
 struct = StructType(fields=manual_schema)
-df2 = spark.read.json(path='data/people.json', schema=struct)
+df2 = spark.read.json(path='../data/people.json', schema=struct)
 df2.printSchema()
 
 print('^^^^^^')
@@ -32,12 +36,12 @@ df3.filter((df3['Close'] < 200) & (df3['Open'] > 200)).show()
 result_filter = df3.filter(df3['Low'] == 197.16).collect()
 row = result_filter[0]
 print(row.asDict()['Volume'])
+df3.withColumn('Year', year(df3['Date'])).show()
 
 df4 = spark.read.csv('data/sales_info.csv', inferSchema=True, header=True)
 group_data = df4.groupby('Conpany')
 group_data.agg({'Sales': 'max'}).show()
 df4.select(avg('Sales').alias('average_sales')).show()
-
 std = df4.select(stddev('Sales').alias('std'))
 std.select(format_number('std', 2).alias('std')).show()
 df4.orderBy('Sales').show()
